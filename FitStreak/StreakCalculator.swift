@@ -15,8 +15,24 @@ struct StreakCalculator {
         let loggedDays = Set(entries.map { loggedDayKey(for: $0) })
         var count = 0
         var cursor = calendar.startOfDay(for: now)
-        while loggedDays.contains(dayKey(of: cursor)) {
-            count += 1
+        var isFirstDay = true
+
+        while true {
+            let key = dayKey(of: cursor)
+            let weekday = calendar.component(.weekday, from: cursor)
+            let isWeekend = (weekday == 1 || weekday == 7)   // Sun = 1, Sat = 7 (gregorian)
+
+            if loggedDays.contains(key) {
+                count += 1
+            } else if isFirstDay {
+                // Today, not yet logged — pending, not a break.
+            } else if isWeekend {
+                // Skipped weekend, streak continues.
+            } else {
+                break   // Missed weekday — streak ends.
+            }
+
+            isFirstDay = false
             guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else {
                 break
             }
