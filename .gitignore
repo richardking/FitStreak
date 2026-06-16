@@ -1,0 +1,14 @@
+# Xcode
+build/
+DerivedData/
+*.xcresult/
+*.xcuserstate
+xcuserdata/
+
+# Build / test artifacts left by xcodebuild
+test_output.log
+test_output.txt
+test_results.xcresult/
+
+# macOS
+.DS_Store
