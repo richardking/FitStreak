@@ -48,4 +48,15 @@ struct StreakCalculatorTests {
         ]
         #expect(calculator.currentStreak(from: entries) == 5)
     }
+
+    @Test func weekdayMissBreaksStreak() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-23 20:00", in: tz)   // Tue (next week)
+        )
+        // Logged the prior Friday; nothing since. Mon was a weekday with no log.
+        let entries = [StreakTestSupport.entry(at: "2026-06-19 09:00", in: tz)]
+        #expect(calculator.currentStreak(from: entries) == 0)
+    }
 }
