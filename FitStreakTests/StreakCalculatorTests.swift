@@ -116,4 +116,35 @@ struct StreakCalculatorTests {
         ]
         #expect(calculator.currentStreak(from: entries) == 1)
     }
+
+    @Test func walksCorrectlyAcrossSpringForwardDST() {
+        let tz = "America/New_York"
+        // Mar 9, 2026 is Monday (the day after spring-forward Sun Mar 8).
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-03-09 20:00", in: tz)
+        )
+        let entries = [
+            StreakTestSupport.entry(at: "2026-03-06 09:00", in: tz),  // Fri
+            StreakTestSupport.entry(at: "2026-03-07 09:00", in: tz),  // Sat
+            StreakTestSupport.entry(at: "2026-03-08 09:00", in: tz),  // Sun (DST day)
+            StreakTestSupport.entry(at: "2026-03-09 09:00", in: tz),  // Mon
+        ]
+        #expect(calculator.currentStreak(from: entries) == 4)
+    }
+
+    @Test func walksCorrectlyAcrossLeapDay() {
+        let tz = "America/New_York"
+        // Feb 29, 2024 was a leap day. Mar 1 2024 was a Friday.
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2024-03-01 20:00", in: tz)
+        )
+        let entries = [
+            StreakTestSupport.entry(at: "2024-02-28 09:00", in: tz),  // Wed
+            StreakTestSupport.entry(at: "2024-02-29 09:00", in: tz),  // Leap Thu
+            StreakTestSupport.entry(at: "2024-03-01 09:00", in: tz),  // Fri
+        ]
+        #expect(calculator.currentStreak(from: entries) == 3)
+    }
 }
