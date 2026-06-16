@@ -48,6 +48,24 @@ struct StreakCalculator {
         return DayKey(year: comps.year!, month: comps.month!, day: comps.day!)
     }
 
+    func canBackfill(targetDay: DayKey) -> Bool {
+        var components = DateComponents()
+        components.year = targetDay.year
+        components.month = targetDay.month
+        components.day = targetDay.day
+        guard let dayStart = calendar.date(from: components) else { return false }
+        guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return false }
+
+        // Reject days that haven't ended yet AND start after today's start-of-day.
+        let todayStart = calendar.startOfDay(for: now)
+        if dayStart > todayStart {
+            return false   // strictly future day
+        }
+
+        let secondsSinceDayEnd = now.timeIntervalSince(dayEnd)
+        return secondsSinceDayEnd <= 48 * 3600
+    }
+
     private func dayKey(of date: Date) -> DayKey {
         let comps = calendar.dateComponents([.year, .month, .day], from: date)
         return DayKey(year: comps.year!, month: comps.month!, day: comps.day!)

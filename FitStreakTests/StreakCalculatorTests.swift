@@ -158,4 +158,23 @@ struct StreakCalculatorTests {
         // Today (Jun 11 Tokyo) has no log → pending; Jun 10 (NY) is logged → count 1.
         #expect(calculator.currentStreak(from: [entry]) == 1)
     }
+
+    @Test func canBackfillWithinFortyEightHourWindow() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-15 10:00", in: tz)   // Mon 10am
+        )
+        // End-of-day for each target (in NY), relative to Mon 10am:
+        // Mon  end = Tue 00:00 (+14h)   → diff = -14h  ≤ 48h → true
+        // Sun  end = Mon 00:00 (-10h)   → diff =  10h  ≤ 48h → true
+        // Sat  end = Sun 00:00 (-34h)   → diff =  34h  ≤ 48h → true
+        // Fri  end = Sat 00:00 (-58h)   → diff =  58h  > 48h → false
+        // Tue  end = Wed 00:00 (+38h)   → diff = -38h, but explicit future guard → false
+        #expect(calculator.canBackfill(targetDay: DayKey(year: 2026, month: 6, day: 15)))  // today
+        #expect(calculator.canBackfill(targetDay: DayKey(year: 2026, month: 6, day: 14)))  // yesterday
+        #expect(calculator.canBackfill(targetDay: DayKey(year: 2026, month: 6, day: 13)))  // sat (34h ago end-of-day)
+        #expect(!calculator.canBackfill(targetDay: DayKey(year: 2026, month: 6, day: 12))) // fri (58h)
+        #expect(!calculator.canBackfill(targetDay: DayKey(year: 2026, month: 6, day: 16))) // tomorrow
+    }
 }
