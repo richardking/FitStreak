@@ -22,4 +22,14 @@ struct StreakCalculatorTests {
         // 11pm NY on Jun 10 is 12pm Tokyo on Jun 11. Entry's day must remain Jun 10.
         #expect(calculator.loggedDayKey(for: entry) == DayKey(year: 2026, month: 6, day: 10))
     }
+
+    @Test func singleEntryTodayReturnsOne() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-15 20:00", in: tz)   // Mon
+        )
+        let entries = [StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz)]
+        #expect(calculator.currentStreak(from: entries) == 1)
+    }
 }
