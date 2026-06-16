@@ -147,4 +147,15 @@ struct StreakCalculatorTests {
         ]
         #expect(calculator.currentStreak(from: entries) == 3)
     }
+
+    @Test func entryTimezoneIsRespectedDuringStreakWalk() {
+        let entry = StreakTestSupport.entry(at: "2026-06-10 23:00", in: "America/New_York")
+        // Tokyo's "now" is 2026-06-11 16:00 (just after the NY 11pm = Tokyo 12pm logged moment).
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: "Asia/Tokyo"),
+            now: StreakTestSupport.date("2026-06-11 16:00", in: "Asia/Tokyo")
+        )
+        // Today (Jun 11 Tokyo) has no log → pending; Jun 10 (NY) is logged → count 1.
+        #expect(calculator.currentStreak(from: [entry]) == 1)
+    }
 }
