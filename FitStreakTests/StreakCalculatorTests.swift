@@ -93,4 +93,14 @@ struct StreakCalculatorTests {
         let entries = [StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz)] // Mon
         #expect(calculator.currentStreak(from: entries) == 1)
     }
+
+    @Test func todayUnloggedSaturdayFridayLogged() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-20 09:00", in: tz)   // Sat, no log yet
+        )
+        let entries = [StreakTestSupport.entry(at: "2026-06-19 09:00", in: tz)] // Fri
+        #expect(calculator.currentStreak(from: entries) == 1)
+    }
 }
