@@ -13,8 +13,16 @@ struct StreakCalculator {
 
     func currentStreak(from entries: [ActivityEntry]) -> Int {
         let loggedDays = Set(entries.map { loggedDayKey(for: $0) })
-        let todayKey = dayKey(of: calendar.startOfDay(for: now))
-        return loggedDays.contains(todayKey) ? 1 : 0
+        var count = 0
+        var cursor = calendar.startOfDay(for: now)
+        while loggedDays.contains(dayKey(of: cursor)) {
+            count += 1
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else {
+                break
+            }
+            cursor = previous
+        }
+        return count
     }
 
     func loggedDayKey(for entry: ActivityEntry) -> DayKey {

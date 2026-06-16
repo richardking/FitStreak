@@ -32,4 +32,20 @@ struct StreakCalculatorTests {
         let entries = [StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz)]
         #expect(calculator.currentStreak(from: entries) == 1)
     }
+
+    @Test func consecutiveWeekdaysReturnFive() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-19 20:00", in: tz)   // Fri
+        )
+        let entries = [
+            StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz),  // Mon
+            StreakTestSupport.entry(at: "2026-06-16 09:00", in: tz),  // Tue
+            StreakTestSupport.entry(at: "2026-06-17 09:00", in: tz),  // Wed
+            StreakTestSupport.entry(at: "2026-06-18 09:00", in: tz),  // Thu
+            StreakTestSupport.entry(at: "2026-06-19 09:00", in: tz),  // Fri
+        ]
+        #expect(calculator.currentStreak(from: entries) == 5)
+    }
 }
