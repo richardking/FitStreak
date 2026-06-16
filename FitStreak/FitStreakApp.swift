@@ -1,21 +1,12 @@
-//
-//  FitStreakApp.swift
-//  FitStreak
-//
-//  Created by Richard King on 6/15/26.
-//
-
+// FitStreak/FitStreakApp.swift
 import SwiftUI
 import SwiftData
 
 @main
 struct FitStreakApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
+        let schema = Schema([ActivityEntry.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
