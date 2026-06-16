@@ -69,4 +69,18 @@ struct StreakCalculatorTests {
         let entries = [StreakTestSupport.entry(at: "2026-06-19 09:00", in: tz)]   // Fri
         #expect(calculator.currentStreak(from: entries) == 1)
     }
+
+    @Test func weekendLogsExtendCount() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-22 20:00", in: tz)   // Mon
+        )
+        let entries = [
+            "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", // Mon-Fri
+            "2026-06-20", "2026-06-21",                                            // Sat-Sun
+            "2026-06-22",                                                          // Mon
+        ].map { StreakTestSupport.entry(at: "\($0) 09:00", in: tz) }
+        #expect(calculator.currentStreak(from: entries) == 8)
+    }
 }
