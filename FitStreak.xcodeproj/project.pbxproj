@@ -94,6 +94,11 @@
 			path = FitStreakUITests;
 			sourceTree = "<group>";
 		};
+		99A0B1C22FE30000DEADBEE1 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +152,7 @@
 				98B4EA952FE1023500E93082 /* FitStreakTests */,
 				98B4EA9F2FE1023500E93082 /* FitStreakUITests */,
 				9897C8D52FE25F26003A65E0 /* FitStreakWidget */,
+				99A0B1C22FE30000DEADBEE1 /* Shared */,
 				9897C8D02FE25F26003A65E0 /* Frameworks */,
 				98B4EA842FE1023400E93082 /* Products */,
 			);
@@ -180,6 +186,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				9897C8D52FE25F26003A65E0 /* FitStreakWidget */,
+				99A0B1C22FE30000DEADBEE1 /* Shared */,
 			);
 			name = FitStreakWidgetExtension;
 			packageProductDependencies = (
@@ -204,6 +211,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				98B4EA852FE1023400E93082 /* FitStreak */,
+				99A0B1C22FE30000DEADBEE1 /* Shared */,
 			);
 			name = FitStreak;
 			packageProductDependencies = (
