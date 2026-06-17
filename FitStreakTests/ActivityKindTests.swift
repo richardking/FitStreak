@@ -4,8 +4,9 @@ import Testing
 
 struct ActivityKindTests {
     @Test func rawValuesAreStable() {
-        #expect(ActivityKind.workout.rawValue == "workout")
-        #expect(ActivityKind.walk.rawValue == "walk")
+        #expect(ActivityKind.weights.rawValue == "weights")
+        #expect(ActivityKind.running.rawValue == "running")
+        #expect(ActivityKind.pickleball.rawValue == "pickleball")
         #expect(ActivityKind.other.rawValue == "other")
     }
 

@@ -22,7 +22,7 @@ struct StreakIntegrationTests {
             context.insert(ActivityEntry(
                 loggedAt: StreakTestSupport.date(s, in: tz),
                 timezone: zone,
-                kind: .workout
+                kind: .weights
             ))
         }
         try context.save()

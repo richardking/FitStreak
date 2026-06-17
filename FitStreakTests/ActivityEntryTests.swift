@@ -8,21 +8,21 @@ struct ActivityEntryTests {
         let id = UUID()
         let when = Date(timeIntervalSince1970: 1_700_000_000)
         let tz = TimeZone(identifier: "America/New_York")!
-        let entry = ActivityEntry(id: id, loggedAt: when, timezone: tz, kind: .walk)
+        let entry = ActivityEntry(id: id, loggedAt: when, timezone: tz, kind: .running)
 
         #expect(entry.id == id)
         #expect(entry.loggedAt == when)
         #expect(entry.timezoneIdentifier == "America/New_York")
-        #expect(entry.kindRaw == "walk")
+        #expect(entry.kindRaw == "running")
     }
 
     @Test func kindAccessorRoundTripsThroughRawString() {
         let entry = ActivityEntry(
             loggedAt: Date(timeIntervalSince1970: 0),
             timezone: .gmt,
-            kind: .workout
+            kind: .weights
         )
-        #expect(entry.kind == .workout)
+        #expect(entry.kind == .weights)
         entry.kind = .other
         #expect(entry.kindRaw == "other")
     }
@@ -31,7 +31,7 @@ struct ActivityEntryTests {
         let entry = ActivityEntry(
             loggedAt: Date(timeIntervalSince1970: 0),
             timezone: TimeZone(identifier: "Asia/Tokyo")!,
-            kind: .workout
+            kind: .weights
         )
         #expect(entry.timezone.identifier == "Asia/Tokyo")
     }

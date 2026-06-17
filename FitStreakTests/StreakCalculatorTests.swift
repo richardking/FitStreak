@@ -159,6 +159,81 @@ struct StreakCalculatorTests {
         #expect(calculator.currentStreak(from: [entry]) == 1)
     }
 
+    @Test func longestStreakFromEmptyEntriesIsZero() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-15 12:00", in: tz)
+        )
+        #expect(calculator.longestStreak(from: []) == 0)
+    }
+
+    @Test func longestStreakFromSingleEntryIsOne() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-19 12:00", in: tz)
+        )
+        let entries = [StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz)]
+        #expect(calculator.longestStreak(from: entries) == 1)
+    }
+
+    @Test func longestStreakPicksTheLongerOfTwoRuns() {
+        let tz = "America/New_York"
+        // 3-day run in early June (Mon-Wed), then 4-day run later (Mon-Thu).
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-30 12:00", in: tz)
+        )
+        let entries = [
+            "2026-06-01", "2026-06-02", "2026-06-03",                  // 3-day Mon-Wed
+            "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18",    // 4-day Mon-Thu
+        ].map { StreakTestSupport.entry(at: "\($0) 09:00", in: tz) }
+        #expect(calculator.longestStreak(from: entries) == 4)
+    }
+
+    @Test func longestStreakHonorsWeekendFreePass() {
+        let tz = "America/New_York"
+        // Mon-Fri week 1 + Mon week 2 should count as 6 (weekend free between).
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-30 12:00", in: tz)
+        )
+        let entries = [
+            "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-19", // Mon-Fri
+            "2026-06-22",                                                          // following Mon
+        ].map { StreakTestSupport.entry(at: "\($0) 09:00", in: tz) }
+        #expect(calculator.longestStreak(from: entries) == 6)
+    }
+
+    @Test func longestStreakDeduplicatesSameDayEntries() {
+        let tz = "America/New_York"
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-30 12:00", in: tz)
+        )
+        let entries = [
+            StreakTestSupport.entry(at: "2026-06-15 09:00", in: tz),
+            StreakTestSupport.entry(at: "2026-06-15 18:00", in: tz),
+            StreakTestSupport.entry(at: "2026-06-15 22:00", in: tz),
+        ]
+        #expect(calculator.longestStreak(from: entries) == 1)
+    }
+
+    @Test func longestStreakReflectsHistoricalRunEvenWhenCurrentIsZero() {
+        let tz = "America/New_York"
+        // A 5-day run a month ago, nothing since.
+        let calculator = StreakCalculator(
+            calendar: StreakTestSupport.calendar(timezone: tz),
+            now: StreakTestSupport.date("2026-06-30 12:00", in: tz)
+        )
+        let entries = [
+            "2026-05-04", "2026-05-05", "2026-05-06", "2026-05-07", "2026-05-08",
+        ].map { StreakTestSupport.entry(at: "\($0) 09:00", in: tz) }
+        #expect(calculator.currentStreak(from: entries) == 0)
+        #expect(calculator.longestStreak(from: entries) == 5)
+    }
+
     @Test func canBackfillWithinFortyEightHourWindow() {
         let tz = "America/New_York"
         let calculator = StreakCalculator(

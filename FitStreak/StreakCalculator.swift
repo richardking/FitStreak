@@ -41,6 +41,24 @@ struct StreakCalculator {
         return count
     }
 
+    /// Longest historical run computed by anchoring `currentStreak` at each
+    /// logged day and taking the max. Reuses every rule in `currentStreak`
+    /// (weekend free pass, same-day dedupe) without duplicating them.
+    func longestStreak(from entries: [ActivityEntry]) -> Int {
+        let loggedDays = Set(entries.map { loggedDayKey(for: $0) })
+        var best = 0
+        for day in loggedDays {
+            var components = DateComponents()
+            components.year = day.year
+            components.month = day.month
+            components.day = day.day
+            guard let dayStart = calendar.date(from: components) else { continue }
+            let anchored = StreakCalculator(calendar: calendar, now: dayStart)
+            best = max(best, anchored.currentStreak(from: entries))
+        }
+        return best
+    }
+
     func loggedDayKey(for entry: ActivityEntry) -> DayKey {
         var entryCalendar = Calendar(identifier: .gregorian)
         entryCalendar.timeZone = entry.timezone
