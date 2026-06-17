@@ -6,6 +6,7 @@
 
 import Foundation
 import SwiftData
+import WidgetKit
 
 @MainActor
 enum ActivityLogger {
@@ -24,6 +25,7 @@ enum ActivityLogger {
             $0.kind == kind && calculator.loggedDayKey(for: $0) == todayKey
         }
 
+        defer { WidgetCenter.shared.reloadAllTimelines() }
         if existing.isEmpty {
             context.insert(ActivityEntry(loggedAt: .now, timezone: .current, kind: kind))
             try context.save()

@@ -26,7 +26,8 @@ struct LogActivityIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         let context = ModelContext(SharedModelContainer.shared)
         try ActivityLogger.toggleTodaysEntry(of: kind, in: context)
-        WidgetCenter.shared.reloadAllTimelines()
+        // ActivityLogger reloads widget timelines itself, so the intent doesn't
+        // need a separate call.
         return .result()
     }
 }
