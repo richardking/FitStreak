@@ -6,7 +6,20 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9897C8D22FE25F26003A65E0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9897C8D12FE25F26003A65E0 /* WidgetKit.framework */; };
+		9897C8D42FE25F26003A65E0 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9897C8D32FE25F26003A65E0 /* SwiftUI.framework */; };
+		9897C8E12FE25F27003A65E0 /* FitStreakWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9897C8CF2FE25F26003A65E0 /* FitStreakWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		9897C8DF2FE25F27003A65E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 98B4EA7B2FE1023400E93082 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9897C8CE2FE25F26003A65E0;
+			remoteInfo = FitStreakWidgetExtension;
+		};
 		98B4EA932FE1023400E93082 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 98B4EA7B2FE1023400E93082 /* Project object */;
@@ -23,13 +36,49 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		9897C8E22FE25F27003A65E0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				9897C8E12FE25F27003A65E0 /* FitStreakWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		9897C8CF2FE25F26003A65E0 /* FitStreakWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FitStreakWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9897C8D12FE25F26003A65E0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		9897C8D32FE25F26003A65E0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9897C8E82FE25F8A003A65E0 /* FitStreakWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitStreakWidgetExtension.entitlements; sourceTree = "<group>"; };
 		98B4EA832FE1023400E93082 /* FitStreak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitStreak.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98B4EA922FE1023400E93082 /* FitStreakTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitStreakTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		98B4EA9C2FE1023500E93082 /* FitStreakUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitStreakUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9897C8E52FE25F27003A65E0 /* Exceptions for "FitStreakWidget" folder in "FitStreakWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 9897C8CE2FE25F26003A65E0 /* FitStreakWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		9897C8D52FE25F26003A65E0 /* FitStreakWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9897C8E52FE25F27003A65E0 /* Exceptions for "FitStreakWidget" folder in "FitStreakWidgetExtension" target */,
+			);
+			path = FitStreakWidget;
+			sourceTree = "<group>";
+		};
 		98B4EA852FE1023400E93082 /* FitStreak */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FitStreak;
@@ -48,6 +97,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9897C8CC2FE25F26003A65E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9897C8D42FE25F26003A65E0 /* SwiftUI.framework in Frameworks */,
+				9897C8D22FE25F26003A65E0 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		98B4EA802FE1023400E93082 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -72,12 +130,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9897C8D02FE25F26003A65E0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9897C8D12FE25F26003A65E0 /* WidgetKit.framework */,
+				9897C8D32FE25F26003A65E0 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		98B4EA7A2FE1023400E93082 = {
 			isa = PBXGroup;
 			children = (
+				9897C8E82FE25F8A003A65E0 /* FitStreakWidgetExtension.entitlements */,
 				98B4EA852FE1023400E93082 /* FitStreak */,
 				98B4EA952FE1023500E93082 /* FitStreakTests */,
 				98B4EA9F2FE1023500E93082 /* FitStreakUITests */,
+				9897C8D52FE25F26003A65E0 /* FitStreakWidget */,
+				9897C8D02FE25F26003A65E0 /* Frameworks */,
 				98B4EA842FE1023400E93082 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +158,7 @@
 				98B4EA832FE1023400E93082 /* FitStreak.app */,
 				98B4EA922FE1023400E93082 /* FitStreakTests.xctest */,
 				98B4EA9C2FE1023500E93082 /* FitStreakUITests.xctest */,
+				9897C8CF2FE25F26003A65E0 /* FitStreakWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +166,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9897C8CE2FE25F26003A65E0 /* FitStreakWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9897C8E62FE25F27003A65E0 /* Build configuration list for PBXNativeTarget "FitStreakWidgetExtension" */;
+			buildPhases = (
+				9897C8CB2FE25F26003A65E0 /* Sources */,
+				9897C8CC2FE25F26003A65E0 /* Frameworks */,
+				9897C8CD2FE25F26003A65E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9897C8D52FE25F26003A65E0 /* FitStreakWidget */,
+			);
+			name = FitStreakWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = FitStreakWidgetExtension;
+			productReference = 9897C8CF2FE25F26003A65E0 /* FitStreakWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		98B4EA822FE1023400E93082 /* FitStreak */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 98B4EAA62FE1023500E93082 /* Build configuration list for PBXNativeTarget "FitStreak" */;
@@ -102,10 +195,12 @@
 				98B4EA7F2FE1023400E93082 /* Sources */,
 				98B4EA802FE1023400E93082 /* Frameworks */,
 				98B4EA812FE1023400E93082 /* Resources */,
+				9897C8E22FE25F27003A65E0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9897C8E02FE25F27003A65E0 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				98B4EA852FE1023400E93082 /* FitStreak */,
@@ -173,6 +268,9 @@
 				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
+					9897C8CE2FE25F26003A65E0 = {
+						CreatedOnToolsVersion = 26.5;
+					};
 					98B4EA822FE1023400E93082 = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -203,11 +301,19 @@
 				98B4EA822FE1023400E93082 /* FitStreak */,
 				98B4EA912FE1023400E93082 /* FitStreakTests */,
 				98B4EA9B2FE1023500E93082 /* FitStreakUITests */,
+				9897C8CE2FE25F26003A65E0 /* FitStreakWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9897C8CD2FE25F26003A65E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		98B4EA812FE1023400E93082 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -232,6 +338,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9897C8CB2FE25F26003A65E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		98B4EA7F2FE1023400E93082 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +369,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9897C8E02FE25F27003A65E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9897C8CE2FE25F26003A65E0 /* FitStreakWidgetExtension */;
+			targetProxy = 9897C8DF2FE25F27003A65E0 /* PBXContainerItemProxy */;
+		};
 		98B4EA942FE1023400E93082 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 98B4EA822FE1023400E93082 /* FitStreak */;
@@ -269,6 +387,73 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		9897C8E32FE25F27003A65E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FitStreakWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B73ZRMP4UM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FitStreakWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FitStreakWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.richardking.FitStreak.FitStreakWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9897C8E42FE25F27003A65E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FitStreakWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = B73ZRMP4UM;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FitStreakWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FitStreakWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.richardking.FitStreak.FitStreakWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		98B4EAA42FE1023500E93082 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -390,6 +575,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitStreak/FitStreak.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B73ZRMP4UM;
@@ -434,6 +620,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FitStreak/FitStreak.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B73ZRMP4UM;
@@ -578,6 +765,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9897C8E62FE25F27003A65E0 /* Build configuration list for PBXNativeTarget "FitStreakWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9897C8E32FE25F27003A65E0 /* Debug */,
+				9897C8E42FE25F27003A65E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		98B4EA7E2FE1023400E93082 /* Build configuration list for PBXProject "FitStreak" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
