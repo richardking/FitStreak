@@ -41,23 +41,7 @@ struct HomeView: View {
     }
 
     private func toggleActivity(_ kind: ActivityKind) {
-        let calendar = Calendar.current
-        let calculator = StreakCalculator(calendar: calendar, now: .now)
-        let comps = calendar.dateComponents([.year, .month, .day], from: .now)
-        let todayKey = DayKey(year: comps.year!, month: comps.month!, day: comps.day!)
-
-        let existing = entries.filter {
-            $0.kind == kind && calculator.loggedDayKey(for: $0) == todayKey
-        }
-
-        if existing.isEmpty {
-            modelContext.insert(ActivityEntry(loggedAt: .now, timezone: .current, kind: kind))
-        } else {
-            for entry in existing {
-                modelContext.delete(entry)
-            }
-        }
-        try? modelContext.save()
+        _ = try? ActivityLogger.toggleTodaysEntry(of: kind, in: modelContext)
     }
 }
 
