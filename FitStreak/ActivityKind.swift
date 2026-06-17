@@ -2,7 +2,8 @@
 import Foundation
 
 enum ActivityKind: String, Codable, CaseIterable, Sendable {
-    case workout
-    case walk
+    case weights
+    case running
+    case pickleball
     case other
 }

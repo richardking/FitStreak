@@ -34,6 +34,48 @@ final class FitStreakUITests: XCTestCase {
     }
 
     @MainActor
+    func testLoggingTodayAppearsAndSurvivesRelaunch() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-resetData"]
+        app.launch()
+
+        let weights = app.buttons["Weights"]
+        XCTAssertTrue(weights.waitForExistence(timeout: 5), "Weights card should be present")
+        weights.tap()
+
+        let loggedLabel = app.staticTexts["Logged today ✓"]
+        XCTAssertTrue(loggedLabel.waitForExistence(timeout: 2), "Subtitle should switch to 'Logged today ✓' after tapping")
+
+        // Persistence: terminate and relaunch WITHOUT reset — entry should still be on disk.
+        app.terminate()
+        app.launchArguments = []
+        app.launch()
+
+        let loggedLabelAfterRelaunch = app.staticTexts["Logged today ✓"]
+        XCTAssertTrue(loggedLabelAfterRelaunch.waitForExistence(timeout: 5), "Logged-today state should survive an app relaunch")
+    }
+
+    @MainActor
+    func testTappingALoggedCardUnlogsIt() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-resetData"]
+        app.launch()
+
+        let weights = app.buttons["Weights"]
+        XCTAssertTrue(weights.waitForExistence(timeout: 5))
+
+        // First tap → logged.
+        weights.tap()
+        XCTAssertTrue(app.staticTexts["Logged today ✓"].waitForExistence(timeout: 2),
+                      "First tap should log today")
+
+        // Second tap → unlogged. Subtitle reverts.
+        weights.tap()
+        XCTAssertTrue(app.staticTexts["Log today to continue"].waitForExistence(timeout: 2),
+                      "Second tap on an already-logged card should unlog it")
+    }
+
+    @MainActor
     func testLaunchPerformance() throws {
         // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {

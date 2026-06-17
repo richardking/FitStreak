@@ -21,7 +21,7 @@ struct ActivityEntryPersistenceTests {
             id: id,
             loggedAt: when,
             timezone: TimeZone(identifier: "America/New_York")!,
-            kind: .walk
+            kind: .running
         )
         context.insert(entry)
         try context.save()
@@ -32,7 +32,7 @@ struct ActivityEntryPersistenceTests {
         #expect(first.id == id)
         #expect(first.loggedAt == when)
         #expect(first.timezoneIdentifier == "America/New_York")
-        #expect(first.kind == .walk)
+        #expect(first.kind == .running)
         #expect(first.timezone.identifier == "America/New_York")
     }
 

@@ -20,7 +20,7 @@ enum StreakTestSupport {
 
     static func entry(at string: String,
                       in timezone: String,
-                      kind: ActivityKind = .workout) -> ActivityEntry {
+                      kind: ActivityKind = .weights) -> ActivityEntry {
         ActivityEntry(
             loggedAt: date(string, in: timezone),
             timezone: TimeZone(identifier: timezone) ?? .gmt,
