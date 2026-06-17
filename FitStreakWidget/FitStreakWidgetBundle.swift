@@ -1,10 +1,4 @@
-//
-//  FitStreakWidgetBundle.swift
-//  FitStreakWidget
-//
-//  Created by Richard King on 6/16/26.
-//
-
+// FitStreakWidget/FitStreakWidgetBundle.swift
 import WidgetKit
 import SwiftUI
 
@@ -12,6 +6,5 @@ import SwiftUI
 struct FitStreakWidgetBundle: WidgetBundle {
     var body: some Widget {
         FitStreakWidget()
-        FitStreakWidgetControl()
     }
 }
