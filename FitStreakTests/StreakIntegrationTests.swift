@@ -6,11 +6,18 @@ import Testing
 
 @MainActor
 struct StreakIntegrationTests {
-    @Test func fetchedEntriesProduceCorrectStreak() throws {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: ActivityEntry.self, configurations: config)
-        let context = container.mainContext
+    // Swift Testing builds a fresh struct per `@Test`, so this init() runs
+    // once per test. Holding the container as a stored property guarantees it
+    // outlives the context for the duration of the test.
+    private let container: ModelContainer
+    private var context: ModelContext { container.mainContext }
 
+    init() throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        container = try ModelContainer(for: ActivityEntry.self, configurations: config)
+    }
+
+    @Test func fetchedEntriesProduceCorrectStreak() throws {
         let tz = "America/New_York"
         let zone = TimeZone(identifier: tz)!
         let dates = [

@@ -6,15 +6,18 @@ import Testing
 
 @MainActor
 struct ActivityEntryPersistenceTests {
-    private func makeContainer() throws -> ModelContainer {
+    // Swift Testing builds a fresh struct per `@Test`, so this init() runs
+    // once per test. Holding the container as a stored property guarantees it
+    // outlives the context for the duration of the test.
+    private let container: ModelContainer
+    private var context: ModelContext { container.mainContext }
+
+    init() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        return try ModelContainer(for: ActivityEntry.self, configurations: config)
+        container = try ModelContainer(for: ActivityEntry.self, configurations: config)
     }
 
     @Test func insertedEntryRoundTripsAllFields() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
-
         let id = UUID()
         let when = Date(timeIntervalSince1970: 1_700_000_000)
         let entry = ActivityEntry(
@@ -37,9 +40,6 @@ struct ActivityEntryPersistenceTests {
     }
 
     @Test func deletingEntryRemovesItFromFetchResults() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
-
         let entry = ActivityEntry(
             loggedAt: Date(timeIntervalSince1970: 0),
             timezone: .gmt,
