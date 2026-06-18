@@ -6,12 +6,16 @@ import Testing
 
 @MainActor
 struct ActivityLoggerTests {
-    // Note: return the container (not just its context) so the caller keeps it
-    // alive. Letting the container drop while the context lives crashes
-    // SwiftData on the next fetch.
-    private func makeContainer() throws -> ModelContainer {
+    // Swift Testing builds a fresh struct per `@Test`, so this init() runs
+    // once per test. Holding the container as a stored property guarantees it
+    // outlives the context — no risk of returning a context whose container
+    // has gone out of scope.
+    private let container: ModelContainer
+    private var context: ModelContext { container.mainContext }
+
+    init() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        return try ModelContainer(for: ActivityEntry.self, configurations: config)
+        container = try ModelContainer(for: ActivityEntry.self, configurations: config)
     }
 
     private func dayKey(_ offsetDays: Int) -> DayKey {
@@ -22,8 +26,6 @@ struct ActivityLoggerTests {
     }
 
     @Test func togglingABackfillDayInsertsThenDeletes() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
         let yesterday = dayKey(-1)
 
         let logged = try ActivityLogger.toggleEntry(of: .weights, onDay: yesterday, in: context)
@@ -36,8 +38,6 @@ struct ActivityLoggerTests {
     }
 
     @Test func insertedEntryRoundTripsThroughLoggedDayKey() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
         let twoDaysAgo = dayKey(-2)
 
         _ = try ActivityLogger.toggleEntry(of: .running, onDay: twoDaysAgo, in: context)
@@ -49,8 +49,6 @@ struct ActivityLoggerTests {
     }
 
     @Test func togglingDifferentKindsOnTheSameDayCoexist() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
         let today = dayKey(0)
 
         _ = try ActivityLogger.toggleEntry(of: .weights, onDay: today, in: context)
@@ -66,9 +64,6 @@ struct ActivityLoggerTests {
     }
 
     @Test func togglingTodayConvenienceMatchesGeneralForm() throws {
-        let container = try makeContainer()
-        let context = container.mainContext
-
         _ = try ActivityLogger.toggleTodaysEntry(of: .pickleball, in: context)
 
         let entries = try context.fetch(FetchDescriptor<ActivityEntry>())
