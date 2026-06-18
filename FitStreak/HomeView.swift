@@ -387,7 +387,7 @@ private struct HeatmapCell: View {
             } else {
                 shape.fill(fill)
                 if isToday {
-                    shape.strokeBorder(.white, lineWidth: 1.5)
+                    shape.strokeBorder(Palette.accent, lineWidth: 1.5)
                 } else if isEditable {
                     shape.strokeBorder(Self.editableStroke, lineWidth: 1.2)
                 }
