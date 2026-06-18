@@ -19,8 +19,10 @@ private enum Palette {
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \ActivityEntry.loggedAt) private var entries: [ActivityEntry]
+    @State private var selectedDay: DayKey?
 
     var body: some View {
+        let calculator = StreakCalculator(calendar: .current, now: .now)
         let derived = Derived(entries: entries)
 
         ScrollView {
@@ -30,7 +32,9 @@ struct HomeView: View {
                 LogTodaySection(loggedToday: derived.loggedToday) { kind in
                     toggleActivity(kind)
                 }
-                HistorySection(history: derived.history)
+                HistorySection(history: derived.history, calculator: calculator) { day in
+                    selectedDay = day
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 24)
@@ -38,6 +42,10 @@ struct HomeView: View {
         }
         .background(Palette.background.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        .sheet(item: $selectedDay) { day in
+            DayDetailSheet(day: day)
+                .presentationDetents([.medium, .large])
+        }
     }
 
     private func toggleActivity(_ kind: ActivityKind) {
@@ -264,11 +272,13 @@ private struct ActivityCard: View {
 
 private struct HistorySection: View {
     let history: [Date: Int]
+    let calculator: StreakCalculator
+    let onTapDay: (DayKey) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionLabel("HISTORY")
-            YearHeatmap(history: history)
+            YearHeatmap(history: history, calculator: calculator, onTapDay: onTapDay)
             HeatmapLegend()
         }
     }
@@ -276,12 +286,14 @@ private struct HistorySection: View {
 
 private struct YearHeatmap: View {
     let history: [Date: Int]
+    let calculator: StreakCalculator
+    let onTapDay: (DayKey) -> Void
 
-    private let cell: CGFloat = 13
-    private let cellSpacing: CGFloat = 4
+    private let cell: CGFloat = 18
+    private let cellSpacing: CGFloat = 5
 
     private var weeks: [HeatmapWeek] {
-        HeatmapBuilder.buildYear(endingOn: .now, history: history)
+        HeatmapBuilder.buildYear(endingOn: .now, history: history, calculator: calculator)
     }
 
     var body: some View {
@@ -307,26 +319,30 @@ private struct YearHeatmap: View {
     }
 
     private func weekColumn(_ week: HeatmapWeek) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: cellSpacing) {
             MonthLabel(text: week.monthLabel)
             ForEach(0..<7, id: \.self) { row in
-                let day = week.days[row]
-                HeatmapCell(
-                    intensity: day?.intensity ?? 0,
-                    present: day != nil,
-                    isToday: day?.isToday == true
-                )
-                .frame(width: cell, height: cell)
+                if let day = week.days[row] {
+                    HeatmapCell(
+                        intensity: day.intensity,
+                        isToday: day.isToday,
+                        isEditable: day.isEditable,
+                        onTap: { onTapDay(day.dayKey) }
+                    )
+                    .frame(width: cell, height: cell)
+                } else {
+                    Color.clear.frame(width: cell, height: cell)
+                }
             }
         }
     }
 
     private var dayLabelColumn: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: cellSpacing) {
             MonthLabel(text: " ")
             ForEach(0..<7, id: \.self) { row in
                 Text(["M", "T", "W", "T", "F", "S", "S"][row])
-                    .font(.system(size: 9, weight: .medium))
+                    .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(row % 2 == 0 ? Color.secondary : Color.clear)
                     .frame(width: 12, height: cell, alignment: .leading)
             }
@@ -347,8 +363,11 @@ private struct MonthLabel: View {
 
 private struct HeatmapCell: View {
     let intensity: Int   // 0...4
-    let present: Bool    // false for future days at the trailing edge
     let isToday: Bool
+    let isEditable: Bool
+    let onTap: () -> Void
+
+    private static let editableStroke = Color.white.opacity(0.40)
 
     private var fill: Color {
         switch intensity {
@@ -361,19 +380,23 @@ private struct HeatmapCell: View {
     }
 
     var body: some View {
-        let shape = RoundedRectangle(cornerRadius: 3, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 4, style: .continuous)
         ZStack {
-            if !present {
-                Color.clear
-            } else if isToday && intensity == 0 {
+            if isToday && intensity == 0 {
                 shape.strokeBorder(Palette.accent, lineWidth: 1.5)
             } else {
                 shape.fill(fill)
                 if isToday {
                     shape.strokeBorder(.white, lineWidth: 1.5)
+                } else if isEditable {
+                    shape.strokeBorder(Self.editableStroke, lineWidth: 1.2)
                 }
             }
         }
+        // Extend the hit area so the tap target reaches HIG comfort even
+        // though the cell itself is only 18pt.
+        .contentShape(Rectangle().inset(by: -6))
+        .onTapGesture(perform: onTap)
     }
 }
 
@@ -426,8 +449,10 @@ private struct SectionLabel: View {
 // MARK: - Heatmap data
 
 private struct HeatmapDay: Hashable {
+    let dayKey: DayKey
     let intensity: Int
     let isToday: Bool
+    let isEditable: Bool
 }
 
 private struct HeatmapWeek: Identifiable {
@@ -437,7 +462,7 @@ private struct HeatmapWeek: Identifiable {
 }
 
 private enum HeatmapBuilder {
-    static func buildYear(endingOn endDate: Date, history: [Date: Int]) -> [HeatmapWeek] {
+    static func buildYear(endingOn endDate: Date, history: [Date: Int], calculator: StreakCalculator) -> [HeatmapWeek] {
         var calendar = Calendar.current
         calendar.firstWeekday = 2 // Monday
 
@@ -459,9 +484,12 @@ private enum HeatmapBuilder {
             for d in 0..<7 {
                 guard let day = calendar.date(byAdding: .day, value: d, to: weekStart) else { days.append(nil); continue }
                 if day > today { days.append(nil); continue }
+                let comps = calendar.dateComponents([.year, .month, .day], from: day)
+                let dayKey = DayKey(year: comps.year!, month: comps.month!, day: comps.day!)
                 let intensity = history[day] ?? 0
                 let isToday = calendar.isDate(day, inSameDayAs: today)
-                days.append(HeatmapDay(intensity: intensity, isToday: isToday))
+                let isEditable = calculator.canBackfill(targetDay: dayKey) && !isToday
+                days.append(HeatmapDay(dayKey: dayKey, intensity: intensity, isToday: isToday, isEditable: isEditable))
             }
 
             let month = calendar.component(.month, from: weekStart)
