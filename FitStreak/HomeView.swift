@@ -381,7 +381,7 @@ private struct HeatmapCell: View {
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 4, style: .continuous)
-        ZStack {
+        let cellBody = ZStack {
             if isToday && intensity == 0 {
                 shape.strokeBorder(Palette.accent, lineWidth: 1.5)
             } else {
@@ -393,10 +393,17 @@ private struct HeatmapCell: View {
                 }
             }
         }
-        // Extend the hit area so the tap target reaches HIG comfort even
-        // though the cell itself is only 18pt.
-        .contentShape(Rectangle().inset(by: -6))
-        .onTapGesture(perform: onTap)
+
+        // Today is non-interactive — the main screen is the canonical surface
+        // for logging today, so opening the same 2×2 grid here would be
+        // redundant. Other days extend their hit area for HIG comfort and tap.
+        if isToday {
+            cellBody
+        } else {
+            cellBody
+                .contentShape(Rectangle().inset(by: -6))
+                .onTapGesture(perform: onTap)
+        }
     }
 }
 
