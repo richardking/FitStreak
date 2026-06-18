@@ -395,13 +395,20 @@ private struct HeatmapCell: View {
         }
 
         // Today is non-interactive — the main screen is the canonical surface
-        // for logging today, so opening the same 2×2 grid here would be
-        // redundant. Other days extend their hit area for HIG comfort and tap.
+        // for logging today. Today still claims its own hit area + a no-op
+        // gesture, otherwise a neighboring cell's extended hit area would
+        // win the tap inside today's visual region.
+        //
+        // Non-today cells extend their hit area only slightly (-2pt). The 5pt
+        // inter-cell gap absorbs the full extension on both sides without any
+        // gesture spilling into the next cell.
         if isToday {
             cellBody
+                .contentShape(Rectangle())
+                .onTapGesture { /* swallow taps on today */ }
         } else {
             cellBody
-                .contentShape(Rectangle().inset(by: -6))
+                .contentShape(Rectangle().inset(by: -2))
                 .onTapGesture(perform: onTap)
         }
     }
