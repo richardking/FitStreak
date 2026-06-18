@@ -29,9 +29,12 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 32) {
                 StreakHero(current: derived.current, hasLoggedToday: derived.hasLoggedToday)
                 StatsRow(best: derived.best, total: derived.total)
-                LogTodaySection(loggedToday: derived.loggedToday) { kind in
-                    toggleActivity(kind)
-                }
+                LogTodaySection(
+                    todayCounts: derived.todayCounts,
+                    onTap: toggleActivity,
+                    onLogAgain: addActivity,
+                    onRemoveLast: removeOneActivity
+                )
                 HistorySection(history: derived.history, calculator: calculator) { day in
                     selectedDay = day
                 }
@@ -51,6 +54,19 @@ struct HomeView: View {
     private func toggleActivity(_ kind: ActivityKind) {
         _ = try? ActivityLogger.toggleTodaysEntry(of: kind, in: modelContext)
     }
+
+    private func addActivity(_ kind: ActivityKind) {
+        _ = try? ActivityLogger.addEntry(of: kind, onDay: todayKey, in: modelContext)
+    }
+
+    private func removeOneActivity(_ kind: ActivityKind) {
+        _ = try? ActivityLogger.removeOneEntry(of: kind, onDay: todayKey, in: modelContext)
+    }
+
+    private var todayKey: DayKey {
+        let comps = Calendar.current.dateComponents([.year, .month, .day], from: .now)
+        return DayKey(year: comps.year!, month: comps.month!, day: comps.day!)
+    }
 }
 
 // MARK: - Derivation
@@ -63,10 +79,11 @@ private struct Derived {
     let current: Int
     let best: Int
     let total: Int
-    let loggedToday: Set<ActivityKind>
+    let todayCounts: [ActivityKind: Int]
     let history: [Date: Int]
 
-    var hasLoggedToday: Bool { !loggedToday.isEmpty }
+    var loggedToday: Set<ActivityKind> { Set(todayCounts.keys) }
+    var hasLoggedToday: Bool { !todayCounts.isEmpty }
 
     init(entries: [ActivityEntry]) {
         let calendar = Calendar.current
@@ -80,11 +97,11 @@ private struct Derived {
         self.total = allDayKeys.count
 
         let todayKey = Self.dayKey(of: now, in: calendar)
-        self.loggedToday = Set(
-            entries
-                .filter { calculator.loggedDayKey(for: $0) == todayKey }
-                .map(\.kind)
-        )
+        var todayCounts: [ActivityKind: Int] = [:]
+        for entry in entries where calculator.loggedDayKey(for: entry) == todayKey {
+            todayCounts[entry.kind, default: 0] += 1
+        }
+        self.todayCounts = todayCounts
 
         var counts: [DayKey: Int] = [:]
         for entry in entries {
@@ -202,8 +219,10 @@ private struct StatItem: View {
 // MARK: - Log Today grid
 
 private struct LogTodaySection: View {
-    let loggedToday: Set<ActivityKind>
+    let todayCounts: [ActivityKind: Int]
     let onTap: (ActivityKind) -> Void
+    let onLogAgain: (ActivityKind) -> Void
+    let onRemoveLast: (ActivityKind) -> Void
 
     private let columns = [
         GridItem(.flexible(), spacing: 12),
@@ -217,8 +236,10 @@ private struct LogTodaySection: View {
                 ForEach(LogCardModel.all) { card in
                     ActivityCard(
                         card: card,
-                        isLogged: loggedToday.contains(card.kind),
-                        onTap: { onTap(card.kind) }
+                        count: todayCounts[card.kind] ?? 0,
+                        onTap: { onTap(card.kind) },
+                        onLogAgain: { onLogAgain(card.kind) },
+                        onRemoveLast: { onRemoveLast(card.kind) }
                     )
                 }
             }
@@ -228,8 +249,10 @@ private struct LogTodaySection: View {
 
 private struct ActivityCard: View {
     let card: LogCardModel
-    let isLogged: Bool
+    let count: Int
     let onTap: () -> Void
+    let onLogAgain: () -> Void
+    let onRemoveLast: () -> Void
 
     var body: some View {
         Button(action: onTap) {
@@ -244,12 +267,8 @@ private struct ActivityCard: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if isLogged {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(Palette.accent)
-                            .transition(.scale.combined(with: .opacity))
-                    }
+                    CountBadge(count: count)
+                        .transition(.scale.combined(with: .opacity))
                 }
                 Text(card.title)
                     .font(.headline)
@@ -263,8 +282,58 @@ private struct ActivityCard: View {
             )
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button(action: onLogAgain) {
+                Label("Log again", systemImage: "plus")
+            }
+            Button(role: .destructive, action: onRemoveLast) {
+                Label("Remove last log", systemImage: "minus")
+            }
+            .disabled(count == 0)
+        }
         .accessibilityLabel(card.title)
-        .accessibilityHint(isLogged ? "Logged today" : "Tap to log")
+        .accessibilityHint(accessibilityHint)
+    }
+
+    private var accessibilityHint: String {
+        switch count {
+        case 0: return "Tap to log. Long-press for more options."
+        case 1: return "Logged today. Tap to remove. Long-press for more options."
+        default: return "Logged \(count) times today. Tap to remove all. Long-press for more options."
+        }
+    }
+}
+
+/// Badge in the top-right corner of an activity card. Source of truth for
+/// how count states present visually. Self-contained accent color so this
+/// view can be used from any file without leaking `Palette`.
+struct CountBadge: View {
+    let count: Int
+
+    private static let accent = Color(red: 0.78, green: 0.96, blue: 0.32)
+
+    var body: some View {
+        switch count {
+        case 0:
+            EmptyView()
+        case 1:
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Self.accent)
+        default:
+            Text(displayText)
+                .font(.system(size: 12, weight: .heavy, design: .rounded))
+                .foregroundStyle(.black)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(Self.accent))
+                .accessibilityLabel("Logged \(count) times")
+        }
+    }
+
+    private var displayText: String {
+        // 5+× cap per design; hopefully unused.
+        count >= 6 ? "5+×" : "\(count)×"
     }
 }
 
@@ -596,4 +665,17 @@ private struct PhoneFrame<Content: View>: View {
 #Preview("Today already logged") {
     PhoneFrame { HomeView() }
         .modelContainer(previewContainer { seedActiveStreak(into: $0, includingToday: true) })
+}
+
+#Preview("Multi-log today") {
+    PhoneFrame { HomeView() }
+        .modelContainer(previewContainer { context in
+            seedActiveStreak(into: context, includingToday: false)
+            // Log Running 2× and Pickleball 3× today so the badges show.
+            context.insert(ActivityEntry(loggedAt: .now, timezone: .current, kind: .running))
+            context.insert(ActivityEntry(loggedAt: .now.addingTimeInterval(60), timezone: .current, kind: .running))
+            context.insert(ActivityEntry(loggedAt: .now, timezone: .current, kind: .pickleball))
+            context.insert(ActivityEntry(loggedAt: .now.addingTimeInterval(60), timezone: .current, kind: .pickleball))
+            context.insert(ActivityEntry(loggedAt: .now.addingTimeInterval(120), timezone: .current, kind: .pickleball))
+        })
 }

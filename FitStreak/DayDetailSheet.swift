@@ -30,10 +30,14 @@ struct DayDetailSheet: View {
 
     private var isEditable: Bool { calculator.canBackfill(targetDay: day) }
 
-    private var loggedKinds: Set<ActivityKind> {
-        Set(allEntries
-            .filter { calculator.loggedDayKey(for: $0) == day }
-            .map(\.kind))
+    private var loggedKinds: Set<ActivityKind> { Set(counts.keys) }
+
+    private var counts: [ActivityKind: Int] {
+        var result: [ActivityKind: Int] = [:]
+        for entry in allEntries where calculator.loggedDayKey(for: entry) == day {
+            result[entry.kind, default: 0] += 1
+        }
+        return result
     }
 
     var body: some View {
@@ -109,8 +113,10 @@ struct DayDetailSheet: View {
             ForEach(LogCardModel.all) { card in
                 EditableCard(
                     card: card,
-                    isLogged: loggedKinds.contains(card.kind),
-                    onTap: { toggle(card.kind) }
+                    count: counts[card.kind] ?? 0,
+                    onTap: { toggle(card.kind) },
+                    onLogAgain: { addOne(card.kind) },
+                    onRemoveLast: { removeOne(card.kind) }
                 )
             }
         }
@@ -118,6 +124,14 @@ struct DayDetailSheet: View {
 
     private func toggle(_ kind: ActivityKind) {
         _ = try? ActivityLogger.toggleEntry(of: kind, onDay: day, in: modelContext)
+    }
+
+    private func addOne(_ kind: ActivityKind) {
+        _ = try? ActivityLogger.addEntry(of: kind, onDay: day, in: modelContext)
+    }
+
+    private func removeOne(_ kind: ActivityKind) {
+        _ = try? ActivityLogger.removeOneEntry(of: kind, onDay: day, in: modelContext)
     }
 
     // MARK: - View-only: stacked list or empty
@@ -129,7 +143,7 @@ struct DayDetailSheet: View {
         } else {
             VStack(spacing: 8) {
                 ForEach(LogCardModel.all.filter { loggedKinds.contains($0.kind) }) { card in
-                    ViewOnlyRow(card: card)
+                    ViewOnlyRow(card: card, count: counts[card.kind] ?? 0)
                 }
             }
             Text("Older days are read-only.")
@@ -175,8 +189,10 @@ struct DayDetailSheet: View {
 
 private struct EditableCard: View {
     let card: LogCardModel
-    let isLogged: Bool
+    let count: Int
     let onTap: () -> Void
+    let onLogAgain: () -> Void
+    let onRemoveLast: () -> Void
 
     var body: some View {
         Button(action: onTap) {
@@ -189,12 +205,8 @@ private struct EditableCard: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if isLogged {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(SheetPalette.accent)
-                            .transition(.scale.combined(with: .opacity))
-                    }
+                    CountBadge(count: count)
+                        .transition(.scale.combined(with: .opacity))
                 }
                 Text(card.title)
                     .font(.headline)
@@ -208,13 +220,23 @@ private struct EditableCard: View {
             )
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button(action: onLogAgain) {
+                Label("Log again", systemImage: "plus")
+            }
+            Button(role: .destructive, action: onRemoveLast) {
+                Label("Remove last log", systemImage: "minus")
+            }
+            .disabled(count == 0)
+        }
         .accessibilityLabel(card.title)
-        .accessibilityHint(isLogged ? "Logged; tap to remove" : "Tap to log")
+        .accessibilityHint(count == 0 ? "Tap to log" : "Logged \(count) times; tap to clear")
     }
 }
 
 private struct ViewOnlyRow: View {
     let card: LogCardModel
+    let count: Int
 
     var body: some View {
         HStack(spacing: 12) {
@@ -228,9 +250,7 @@ private struct ViewOnlyRow: View {
                 .font(.headline)
                 .foregroundStyle(.primary)
             Spacer()
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(SheetPalette.accent.opacity(0.85))
+            CountBadge(count: count)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
